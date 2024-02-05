@@ -1,36 +1,40 @@
-const apiKey = 'YOUR_API_KEY'; // Replace with your TMDb API key
-
-document.getElementById('searchButton').addEventListener('click', searchMovies);
+const apiKey = '19d1f5022e40544c6415eac1cec644ee';
 
 async function searchMovies() {
-    const query = document.getElementById('searchInput').value;
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}`;
+    const searchInput = document.getElementById('searchInput').value.trim();
+
+    // Check if search input is empty
+    if (searchInput === '') {
+        alert('Please enter a movie title to search.');
+        return;
+    }
+
+    const apiUrl = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(searchInput)}`;
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(apiUrl);
         const data = await response.json();
         displayMovies(data.results);
     } catch (error) {
-        console.error('Error fetching movie data:', error);
+        console.log('Error fetching movie data:', error);
     }
 }
 
 function displayMovies(movies) {
-    const mainContent = document.getElementById('mainContent');
-    mainContent.innerHTML = '';
+    const movieList = document.getElementById('movie-list');
+    movieList.innerHTML = '';
 
-    movies.forEach(movie => {
-        const movieDiv = document.createElement('div');
-        movieDiv.classList.add('movie');
-
-        const title = document.createElement('h2');
-        title.textContent = movie.title;
-
-        const overview = document.createElement('p');
-        overview.textContent = movie.overview;
-
-        movieDiv.appendChild(title);
-        movieDiv.appendChild(overview);
-        mainContent.appendChild(movieDiv);
+    movies.forEach((movie) => {
+        const movieItem = document.createElement('div');
+        movieItem.classList.add('movie-item');
+        const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`; // Construct poster URL
+        movieItem.innerHTML = `
+            <h2>${movie.title}</h2>
+            <img src="${posterUrl}" alt="${movie.title} Poster"> <!-- Add image tag for poster -->
+            <p>${movie.overview}</p>
+        `;
+        movieList.appendChild(movieItem);
     });
 }
+
+document.getElementById('search-button').addEventListener('click', searchMovies);
